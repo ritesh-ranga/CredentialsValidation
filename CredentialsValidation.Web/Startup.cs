@@ -23,6 +23,9 @@ namespace CredentialsValidation.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            // Load the custom configurations
+            services.Configure<MyConfiguration>(Configuration.GetSection("myConfiguration"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

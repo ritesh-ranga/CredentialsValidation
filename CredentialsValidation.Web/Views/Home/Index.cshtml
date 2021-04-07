@@ -1,38 +1,171 @@
-﻿@{
+﻿@model CredentialsValidation.Abstractions.Credentials
+
+@{
     ViewData["Title"] = "Home Page";
+}
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            $('#btn_Validate').click(function () {
+                var inputIsOkay = true;
+                var errorMsg = "";
+
+                if ($("#txt_Email").val().length == 0) {
+                     inputIsOkay = false;
+                     errorMsg = "Please enter an e-mail address.<br/>";
+                }
+
+                if ($("#txt_Password").val().length == 0) {
+                    inputIsOkay = false;
+                    errorMsg += "Please enter a password.<br/>";
+                }
+
+                if (inputIsOkay === true) {
+                    $("#btn_Validate").hide();
+                    $("#divSpinner").show();
+
+                    var frmPostCredentials = $("#frmPostCredentials").serialize();
+                    $.ajax({
+                        url: '@Url.Action("Validate", "Home")',
+                        type: 'POST',
+                        traditional: true,
+                        data: frmPostCredentials,
+                        dataType: 'json',
+                        ContentType: "application/json;utf-8",
+                        cache: false,
+                        success: function (response) {
+                            $("#btn_Validate").show();
+                            $("#divSpinner").hide();
+
+                            if (response === true) {
+                                $("#divSuccess").show();
+                            }
+                            else {
+                                $("#divError").show();
+                            }
+                        },
+                        error: function (response) {
+                            $("#btn_Validate").show();
+                            $("#divSpinner").hide();
+                            $("#divError").show();
+                        }
+                    });
+                }
+                else {
+                    $('#divMessageModalBody').html(errorMsg);
+                    $("#divMessage").show();
+                }
+            });
+
+            $("#btnCloseSuccess").on('click', function (e) {
+                e.preventDefault();
+                $("#divSuccess").hide();
+                return false;
+            });
+
+            $("#btnCloseError").on('click', function (e) {
+                e.preventDefault();
+                $("#divError").hide();
+                return false;
+            });
+
+            $("#btnCloseMessageModal").on('click', function (e) {
+                e.preventDefault();
+                $("#divMessage").hide();
+                return false;
+            });
+
+        });
+    </script>
 }
 
 <div>
     <h1 class="display-4">Welcome!</h1>
 
-    <div class="row justify-content-center">
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    Credentials
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "frmPostCredentials" }))
+    {
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-header">
+                        Credentials
+                    </div>
+                    <div class="card-body">
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-2">
+                                <label for="inputEmail3" class="col-form-label">Email</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="email" class="form-control" id="txt_Email" asp-for="EMail" placeholder="name@example.com">
+                            </div>
+                        </div>
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-2">
+                                <label for="inputPassword3" class="col-form-label">Password</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="password" class="form-control" id="txt_Password" asp-for="Password" placeholder="password">
+                            </div>
+                        </div>
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-2 justify-content-center">
+                                <button id="btn_Validate" class="btn btn-primary">Validate</button>
+                                <div id="divSpinner" style="display:none" class="spinner-border text-primary" role="status"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row justify-content-center mb-3">
-                        <div class="col-2">
-                            <label for="inputEmail3" class="col-form-label">Email</label>
-                        </div>
-                        <div class="col-6">
-                            <input type="email" class="form-control" id="txt_Email" placeholder="name@example.com">
-                        </div>
-                    </div>
-                    <div class="row justify-content-center mb-3">
-                        <div class="col-2">
-                            <label for="inputPassword3" class="col-form-label">Password</label>
-                        </div>
-                        <div class="col-6">
-                            <input type="password" class="form-control" id="txt_Password" placeholder="password">
-                        </div>
-                    </div>
-                    <div class="row justify-content-center mb-3">
-                        <div class="col-2 justify-content-center">
-                            <button id="btn_Validate" class="btn btn-primary">Validate</button>
-                        </div>
-                    </div>
+            </div>
+        </div>
+    }
+
+
+    <div id="divSuccess" style="display:none" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Success</h5>
+                </div>
+                <div class="modal-body">
+                    <p>The credentials validated successfully!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCloseSuccess" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="divError" style="display:none" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Error</h5>
+                </div>
+                <div class="modal-body">
+                    <p>An unexpected error occured!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCloseError" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="divMessage" style="display:none" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Error</h5>
+                </div>
+                <div id="divMessageModalBody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCloseMessageModal" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
