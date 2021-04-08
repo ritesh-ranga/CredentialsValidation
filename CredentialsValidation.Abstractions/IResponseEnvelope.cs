@@ -13,7 +13,7 @@
         public string SuccessMessage { get; set; }
 
         /// <summary>
-        /// An <see cref="ErrorCollection"/> containing errors, if the request was a failure
+        /// An <see cref="ErrorCollection"/> containing a list of errors, if the request was a failure
         /// </summary>
         public ErrorCollection Errors { get; set; }
     }

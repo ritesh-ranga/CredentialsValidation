@@ -27,28 +27,30 @@ namespace CredentialsValidation.Web.Controllers
             return View();
         }
 
-        // POST: HomeController/Validate
+        // POST: Home/Validate
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> ValidateAsync(IFormCollection collection)
         {
-            bool success = false;
+            ResponseEnvelope responseEnvelope = new ResponseEnvelope();
 
             try
             {
-                Credentials credentialsObj = new Credentials();
-                credentialsObj.EMail = collection["EMail"];
-                credentialsObj.Password = collection["Password"];
+                Credentials credentialsObj = new Credentials
+                {
+                    EMail = collection["EMail"],
+                    Password = collection["Password"]
+                };
 
                 ServiceHelper serviceHelper = new ServiceHelper(_myConfiguration.WebAPIBaseURL);
-                success = await serviceHelper.ValidateCredentialsAsync(credentialsObj);
+                responseEnvelope = await serviceHelper.ValidateCredentialsAsync(credentialsObj);
             }
             catch
             {
                 // Log the exception
             }
 
-            return Json(success);
+            return Json(responseEnvelope);
         }
 
         public IActionResult Privacy()

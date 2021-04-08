@@ -1,11 +1,11 @@
 ﻿namespace CredentialsValidation.Abstractions
 {
     /// <summary>
-    /// A class representing an error
+    /// A class representing an error that occured while validating a <see cref="ICredentials"/> field
     /// </summary>
     public class Error
     {
-        public string Type { get; set; }
+        public ErrorType Type { get; set; }
 
         public string TechnicalMessage { get; set; }
 

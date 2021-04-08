@@ -1,6 +1,6 @@
 ﻿namespace CredentialsValidation.Abstractions
 {
-    public class Credentials
+    public interface ICredentials
     {
         public string EMail { get; set; }
 

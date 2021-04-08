@@ -1,4 +1,4 @@
-﻿@model CredentialsValidation.Abstractions.Credentials
+﻿@model CredentialsValidation.Abstractions.ICredentials
 
 @{
     ViewData["Title"] = "Home Page";
@@ -6,13 +6,17 @@
 
 @section scripts
 {
-    <script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script type="text/javascript" language="javascript">
         $(document).ready(function () {
 
-            $('#btn_Validate').click(function () {
+            $("#btn_Validate").on('click', function (e) {
+                e.preventDefault();
                 var inputIsOkay = true;
                 var errorMsg = "";
 
+                // First do some client side validation
                 if ($("#txt_Email").val().length == 0) {
                      inputIsOkay = false;
                      errorMsg = "Please enter an e-mail address.<br/>";
@@ -24,6 +28,7 @@
                 }
 
                 if (inputIsOkay === true) {
+                    // Show the spinner before making the async call
                     $("#btn_Validate").hide();
                     $("#divSpinner").show();
 
@@ -37,9 +42,15 @@
                         ContentType: "application/json;utf-8",
                         cache: false,
                         success: function (response) {
+                             // Async call done, return the controls to the earlier state
                             $("#btn_Validate").show();
                             $("#divSpinner").hide();
 
+                            // Clear the old values
+                            $('#txt_Email').attr("value") = "";
+                            $('#txt_Password').attr("value") = "";
+
+                            // Inform user about the result
                             if (response === true) {
                                 $("#divSuccess").show();
                             }
@@ -48,6 +59,7 @@
                             }
                         },
                         error: function (response) {
+                            // An error occured, return the controls to the earlier state and inform the user
                             $("#btn_Validate").show();
                             $("#divSpinner").hide();
                             $("#divError").show();
@@ -113,7 +125,7 @@
                         </div>
                         <div class="row justify-content-center mb-3">
                             <div class="col-2 justify-content-center">
-                                <button id="btn_Validate" class="btn btn-primary">Validate</button>
+                                <button type="button" id="btn_Validate" class="btn btn-primary">Validate</button>
                                 <div id="divSpinner" style="display:none" class="spinner-border text-primary" role="status"></div>
                             </div>
                         </div>
