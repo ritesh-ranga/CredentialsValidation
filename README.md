@@ -12,6 +12,9 @@ The front-end provides a page for the user to enter credentials. After validatio
 ### Back-end
 .NET Core WebAPI is used as the back-end written in C#. The WebAPI exposes a POST endpoint to which the credentials can be posted. Then the credentials are checked against a set of rules and the result is returned in a response envelope.
 
+### Data Access Layer
+Repository pattern is implemented to access the underlying database. The DAL is essentially database agnostic, which is achieved through abstraction and dependency injection. Currently the DAL uses a SQL Server implementation to store data, but the same can be swapped easily with any other database.
+
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
