@@ -2,6 +2,7 @@
 using CredentialsValidation.Database.Abstractions;
 using CredentialsValidation.Shared;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Threading.Tasks;
 
@@ -11,42 +12,81 @@ namespace CredentialsValidation.WebAPI.Controllers
     [ApiController]
     public class CredentialsController : ControllerBase
     {
-        private IRepository Repository;
-        public CredentialsController(IRepository repository)
+        private readonly IStringLocalizer _localizer;
+        private IRepository _repository;
+
+        public CredentialsController(IRepository repository, IStringLocalizer<Resource> localizer)
         {
-            Repository = repository;
+            _repository = repository;
+            _localizer = localizer;
         }
 
         [HttpPost]
         public async Task<ActionResult<ResponseEnvelope>> ValidateCredentials(Credentials credentials)
         {
-            ResponseEnvelope responseEnvelope = new ResponseEnvelope();
+            ResponseEnvelope responseEnvelope = new ResponseEnvelope
+            {
+                Success = true,
+                Errors = new ErrorCollection()
+            };
 
             try
             {
                 // First of all, validate the incoming values
                 IValidator validator = new Validator();
-                responseEnvelope = (ResponseEnvelope)validator.Validate(credentials);
+              
+                // Check if EMail is valid
+                if (!validator.ValidateEmail(credentials.EMail))
+                {
+                    // Email is not valid, set the flag and add the corresponding error to the collection
+                    responseEnvelope.Success = false;
+                    responseEnvelope.Errors.Add(
+                        new Error()
+                        {
+                            // Validation failed, prepare the error object stating details
+                            Type = ErrorType.ValidationError,
+                            HumanReadableMessage = _localizer["EMailInvalid"],
+                            TechnicalMessage = _localizer["EMailInvalidTechnical"],
+                            AdditionalInfo = string.Empty
+                        });
+                }
 
+                // Check if Password is valid
+                if (!validator.ValidatePassword(credentials.Password))
+                {
+                    // Password is not valid, set the flag and add the corresponding error to the collection
+                    responseEnvelope.Success = false;
+                    responseEnvelope.Errors.Add(
+                       new Error()
+                       {
+                           // Validation failed, prepare the error object stating details
+                           Type = ErrorType.ValidationError,
+                           HumanReadableMessage = _localizer["PasswordInvalid"],
+                           TechnicalMessage = _localizer["PasswordInvalidTechnical"],
+                           AdditionalInfo = string.Empty
+                       });
+                }
+
+                // Input validation process done, proceed accordingly
                 if (responseEnvelope.Success)
                 {
                     // Input is correct, check if it already exists
-                    if (Repository.CredentialsExists(credentials))
+                    if (_repository.CredentialsExists(credentials))
                     {
                         responseEnvelope.Success = false;
                         responseEnvelope.Errors.Add(new Error()
                         {
                             Type = ErrorType.RedundancyError,
-                            HumanReadableMessage = "The provided E-Mail address is already registered!"
+                            HumanReadableMessage = _localizer["EMailAlreadyRegistered"]
                         });
                     }
                     else
                     {
-                        // Add it to the existing collection/database
-                        if (Repository.AddCredentials(credentials))
+                        // New credential, add it to the existing collection/database
+                        if (_repository.AddCredentials(credentials))
                         {
                             responseEnvelope.Success = true;
-                            responseEnvelope.SuccessMessage = "Credentials validated and registered successfully!";
+                            responseEnvelope.SuccessMessage = _localizer["CredentialsSuccess"];
                         }
                         else
                         {
@@ -54,7 +94,7 @@ namespace CredentialsValidation.WebAPI.Controllers
                             responseEnvelope.Errors.Add(new Error()
                             {
                                 Type = ErrorType.Exception,
-                                HumanReadableMessage = "The provided E-Mail address cannot be successfully registered!"
+                                HumanReadableMessage = _localizer["ErrorWhileAdding"]
                             });
                         }
                     }
@@ -69,9 +109,9 @@ namespace CredentialsValidation.WebAPI.Controllers
                 {
                     new Error()
                     {
-                        Type= ErrorType.Exception,
-                        HumanReadableMessage="An unexpected error occured during registration!",
-                        TechnicalMessage=ex.Message
+                        Type = ErrorType.Exception,
+                        HumanReadableMessage = _localizer["UnexpectedException"],
+                        TechnicalMessage = ex.Message
                     }
                 };
             }

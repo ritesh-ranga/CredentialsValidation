@@ -10,46 +10,13 @@ namespace CredentialsValidation.Shared
     public class Validator : IValidator
     {
         /// <summary>
-        /// A method that takes <see cref="Credentials"/> object and validates the fields contained within
-        /// </summary>
-        /// <param name="CredentialsToBeValidated">A <see cref="Credentials"/> object to be validated</param>
-        /// <returns>A <see cref="IResponseEnvelope"/> that contains the validation result along with errors, if any</returns>
-        public IResponseEnvelope Validate(ICredentials CredentialsToBeValidated)
-        {
-            IResponseEnvelope responseEnvelope = new ResponseEnvelope
-            {
-                Success = true,
-                Errors = new ErrorCollection()
-            };
-
-            // Check if EMail is valid
-            if (!ValidateEmail(CredentialsToBeValidated.EMail, out Error error))
-            {
-                // Email is not valid, set the flag and add the corresponding error to the collection
-                responseEnvelope.Success = false;
-                responseEnvelope.Errors.Add(error);
-            }
-
-            // Check if Password is valid
-            if (!ValidatePassword(CredentialsToBeValidated.Password, out error))
-            {
-                // Password is not valid, set the flag and add the corresponding error to the collection
-                responseEnvelope.Success = false;
-                responseEnvelope.Errors.Add(error);
-            }
-
-            return responseEnvelope;
-        }
-
-        /// <summary>
         /// A method that validates an Email address by matching it against a regular expression
         /// </summary>
         /// <param name="Email">An Email address to be validated of type <see cref="string"/></param>
         /// <returns>A <see cref="bool"/> flag representing if the validation was success or failure</returns>
-        public bool ValidateEmail(string Email, out Error error)
+        public bool ValidateEmail(string Email)
         {
             bool isValid = false;
-            error = new Error();
 
             try
             {
@@ -60,24 +27,11 @@ namespace CredentialsValidation.Shared
                         // Validation successful
                         isValid = true;
                     }
-                    else
-                    {
-                        // Validation failed, prepare the error object stating details
-                        error.Type = ErrorType.ValidationError;
-                        error.HumanReadableMessage = "Provided E-Mail address is not valid.";
-                        error.TechnicalMessage = "Regex match failed!";
-                        error.AdditionalInfo = string.Empty;
-                    }
                 }
             }
             catch (Exception ex)
             {
                 // TODO: Log the exception
-
-                error.Type = ErrorType.Exception;
-                error.HumanReadableMessage = "An unexpected error occured!";
-                error.TechnicalMessage = ex.Message;
-                error.AdditionalInfo = ex.StackTrace;
             }
 
             return isValid;
@@ -88,10 +42,9 @@ namespace CredentialsValidation.Shared
         /// </summary>
         /// <param name="Password">A Password to be validated of type <see cref="string"/></param>
         /// <returns>A <see cref="bool"/> flag representing if the validation was success or failure</returns>
-        public bool ValidatePassword(string Password, out Error error)
+        public bool ValidatePassword(string Password)
         {
             bool isValid = false;
-            error = new Error();
 
             try
             {
@@ -100,23 +53,10 @@ namespace CredentialsValidation.Shared
                     // Validation successful
                     isValid = true;
                 }
-                else
-                {
-                    // Validation failed, prepare the error object stating details
-                    error.Type = ErrorType.ValidationError;
-                    error.HumanReadableMessage = "Provided Password is not valid. It should be at least 8 characters long!";
-                    error.TechnicalMessage = "The password is less than 8 characters long!";
-                    error.AdditionalInfo = string.Empty;
-                }
             }
             catch (Exception ex)
             {
                 // TODO: Log the exception
-
-                error.Type = ErrorType.Exception;
-                error.HumanReadableMessage = "An unexpected error occured!";
-                error.TechnicalMessage = ex.Message;
-                error.AdditionalInfo = ex.StackTrace;
             }
 
             return isValid;

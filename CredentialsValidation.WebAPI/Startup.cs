@@ -36,6 +36,8 @@ namespace CredentialsValidation.WebAPI
             //string connectionString = Configuration.GetConnectionString("AppDb");
             //services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer(connectionString));
             //services.AddScoped<IRepository, SqlRepository>();
+
+            services.AddLocalization();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
