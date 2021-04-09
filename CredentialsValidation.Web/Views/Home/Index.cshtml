@@ -47,15 +47,24 @@
                             $("#divSpinner").hide();
 
                             // Clear the old values
-                            $('#txt_Email').attr("value") = "";
-                            $('#txt_Password').attr("value") = "";
+                            //$('#txt_Email').val("");
+                            //$('#txt_Password').val("");
 
                             // Inform user about the result
-                            if (response === true) {
+                            if (response.success === true) {
+                                // Validation succeeded
+                                $('#divSuccess').html(response.successMessage);
                                 $("#divSuccess").show();
                             }
                             else {
-                                $("#divError").show();
+                                // Validation failed, inform user about the results
+                                var errorMsg = "";
+                                $.each(response.errors, function (key, value) {
+                                    errorMsg += value.humanReadableMessage + "<br/>";
+                                });
+
+                                $('#divMessageModalBody').html(errorMsg);
+                                $("#divMessage").show();
                             }
                         },
                         error: function (response) {
@@ -125,7 +134,7 @@
                         </div>
                         <div class="row justify-content-center mb-3">
                             <div class="col-2 justify-content-center">
-                                <button type="button" id="btn_Validate" class="btn btn-primary">Validate</button>
+                                <button type="button" id="btn_Validate" class="btn btn-primary">Validate</button><br />
                                 <div id="divSpinner" style="display:none" class="spinner-border text-primary" role="status"></div>
                             </div>
                         </div>
