@@ -110,7 +110,7 @@ namespace CredentialsValidation.Shared
                 {
                     // Validation failed, prepare the error object stating details
                     error.Type = ErrorType.ValidationError;
-                    error.HumanReadableMessage = "Provided Password is not valid.";
+                    error.HumanReadableMessage = "Provided Password is not valid. It should be at least 8 characters long!";
                     error.TechnicalMessage = "The password is less than 8 characters long!";
                     error.AdditionalInfo = string.Empty;
                 }
