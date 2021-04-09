@@ -38,12 +38,6 @@ namespace CredentialsValidation.Shared
                 responseEnvelope.Errors.Add(error);
             }
 
-            // If all the fields of the credential object are validated, set the appropriate message
-            if (responseEnvelope.Success)
-            {
-                responseEnvelope.SuccessMessage = "Credentials validated successfully!";
-            }
-
             return responseEnvelope;
         }
 

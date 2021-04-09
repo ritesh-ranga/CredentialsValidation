@@ -1,6 +1,9 @@
+using CredentialsValidation.Database;
+using CredentialsValidation.Database.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,6 +28,14 @@ namespace CredentialsValidation.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            // To point the DAL to the in-memory database
+            services.AddScoped<IRepository, InMemoryRepository>();
+
+            //// To point the DAL to the SQL Server database
+            //string connectionString = Configuration.GetConnectionString("AppDb");
+            //services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer(connectionString));
+            //services.AddScoped<IRepository, SqlRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

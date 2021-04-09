@@ -53,7 +53,7 @@
                             // Inform user about the result
                             if (response.success === true) {
                                 // Validation succeeded
-                                $('#divSuccess').html(response.successMessage);
+                                $('#divSuccessModalBody').html(response.successMessage);
                                 $("#divSuccess").show();
                             }
                             else {
@@ -151,7 +151,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Success</h5>
                 </div>
-                <div class="modal-body">
+                <div id="divSuccessModalBody" class="modal-body">
                     <p>The credentials validated successfully!</p>
                 </div>
                 <div class="modal-footer">
